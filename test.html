@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>会計アプリ</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <h1>会計アプリ</h1>
+  <form id="form">
+    <input type="date" id="date" required />
+    <input type="text" id="store" placeholder="店舗名" required />
+    <input type="text" id="staff" placeholder="担当者" required />
+    <input type="number" id="amount" placeholder="金額" required />
+    <input type="text" id="category" placeholder="カテゴリ" required />
+    <input type="text" id="memo" placeholder="メモ（任意）" />
+    <button type="submit">送信</button>
+  </form>
+  <div id="result"></div>
+  <script src="script.js"></script>
+</body>
+</html>
