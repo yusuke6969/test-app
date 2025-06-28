@@ -10,7 +10,7 @@ document.getElementById('form').addEventListener('submit', async function(e) {
     memo: document.getElementById('memo').value
   };
 
-  const webhookUrl = 'https://script.google.com/macros/s/【ここにWebアプリURLを貼る】/exec';
+  const webhookUrl = 'https://script.google.com/macros/s/AKfycbxSKhYsx4MFX6XxGE5bOnsR4daTDRsG8yGvg7t-Naw/dev/exec';
 
   try {
     const res = await fetch(webhookUrl, {
