@@ -10,7 +10,7 @@ document.getElementById('form').addEventListener('submit', async function(e) {
     memo: document.getElementById('memo').value
   };
 
-  const webhookUrl = 'https://script.google.com/macros/s/AKfycbyJ--CCORt-vnxWOiJIsEnhbFipkkktQBiDEH4YFevD3MoLeSj-y4ghyjLUyQErrB5d/exec
+  const webhookUrl = 'https://script.google.com/macros/s/AKfycbyzrhuPthVKytpK6pPjdwhZpddSkDtAAfWF4B56btNEebG0cK09vK2xOIGd5RRAlr3_/exec
 ';
 
   try {
