@@ -3,15 +3,17 @@ const adminView = document.getElementById("adminView");
 const balanceDisplay = document.getElementById("balance");
 const summaryArea = document.getElementById("summaryArea");
 let currentBalance = 0;
-let records = JSON.parse(localStorage.getItem("records") || "[]");
-
-const GAS_URL = "https://script.google.com/macros/s/AKfycbw1VCo15tfwtVYPNowUE04QuN11IzJflXnPflxP2o1OyZhBFkFHMP6nUM2HF0mcwJ8V6g/exec";
+const records = [];
 
 const categoryData = {
-  "バックスバー": [["🪙", "チケット売上"], ["🥃", "ボトル売上"], ["🍶", "酒仕入れ"], ["🥬", "食材仕入れ"],
-                    ["🧻", "消耗品"], ["🍱", "ランチ食材仕入れ"], ["🧼", "ランチ消耗品"], ["📦", "その他支払い"]],
-  "豚汁屋": [["💰", "売上"], ["🥩", "肉仕入"], ["🥕", "野菜仕入"], ["🍚", "米仕入"],
-             ["🧂", "その他食材仕入れ"], ["🍶", "酒類仕入れ"], ["🧻", "消耗品"], ["📦", "その他支払い"]]
+  "バックスバー": [
+    ["🪙", "チケット売上"], ["🥃", "ボトル売上"], ["🍶", "酒仕入れ"], ["🥬", "食材仕入れ"],
+    ["🧻", "消耗品"], ["🍱", "ランチ食材仕入れ"], ["🧼", "ランチ消耗品"], ["📦", "その他支払い"]
+  ],
+  "豚汁屋": [
+    ["💰", "売上"], ["🥩", "肉仕入"], ["🥕", "野菜仕入"], ["🍚", "米仕入"],
+    ["🧂", "その他食材仕入れ"], ["🍶", "酒類仕入れ"], ["🧻", "消耗品"], ["📦", "その他支払い"]
+  ]
 };
 
 function updateCategoryButtons() {
@@ -45,53 +47,26 @@ function addEntry(category, icon) {
 
   const record = { date, store, staff, category, amount, memo, icon, type };
   records.push(record);
-  saveToLocal();
-  sendToGAS(record);
 
+  const displayText = `${icon} ${category}：${memo ? memo + ' ' : ''}¥${amount}（${store}・${staff}・${date}）`;
   const div = document.createElement("div");
   div.className = "entry";
-  div.innerHTML = `<span>${icon} ${category}：${memo ? memo + ' ' : ''}¥${amount}（${store}・${staff}・${date}）</span>
-                   <button onclick="deleteEntry(${records.length - 1})">🗑</button>`;
+  div.innerHTML = `<span>${displayText}</span><button onclick="this.parentElement.remove()">🗑</button>`;
   logDisplay.appendChild(div);
 
   document.getElementById("amount").value = "";
   document.getElementById("memo").value = "";
+
+  sendToSpreadsheet(record);
 }
 
-function sendToGAS(record) {
-  fetch(GAS_URL, {
+function sendToSpreadsheet(data) {
+  fetch("https://script.google.com/macros/s/AKfycbwTiQ1N_tYlqj7cePw9L87eJAPlSqyK6O0P_SMH2RFx6BS8JtvTVHk1O8brOGaI0D4wgg/exec", {
     method: "POST",
     mode: "no-cors",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(record)
+    body: JSON.stringify(data)
   });
-}
-
-function deleteEntry(index) {
-  records.splice(index, 1);
-  saveToLocal();
-  renderLog();
-}
-
-function saveToLocal() {
-  localStorage.setItem("records", JSON.stringify(records));
-}
-
-function renderLog() {
-  logDisplay.innerHTML = "";
-  currentBalance = 0;
-  records.forEach((r, i) => {
-    const div = document.createElement("div");
-    div.className = "entry";
-    const type = r.category.includes("売上") ? "売上" : "支出";
-    if (type === "売上") currentBalance += r.amount;
-    else currentBalance -= r.amount;
-
-    div.innerHTML = `<span>${r.icon} ${r.category}：${r.memo ? r.memo + ' ' : ''}¥${r.amount}（${r.store}・${r.staff}・${r.date}）</span>
-                     <button onclick="deleteEntry(${i})">🗑</button>`;
-    logDisplay.appendChild(div);
-  });
-  balanceDisplay.textContent = currentBalance;
 }
 
 function checkAdmin() {
@@ -139,4 +114,3 @@ function showMonthlySummary() {
 
 document.getElementById("date").valueAsDate = new Date();
 updateCategoryButtons();
-renderLog();
