@@ -2,22 +2,40 @@
 <html lang="ja">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>会計アプリ</title>
-  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
   <h1>会計アプリ</h1>
-  <form id="form">
-    <input type="date" id="date" required />
-    <input type="text" id="store" placeholder="店舗名" required />
-    <input type="text" id="staff" placeholder="担当者" required />
-    <input type="number" id="amount" placeholder="金額" required />
-    <input type="text" id="category" placeholder="カテゴリ" required />
-    <input type="text" id="memo" placeholder="メモ（任意）" />
-    <button type="submit">送信</button>
-  </form>
-  <div id="result"></div>
+  <div>
+    <input type="date" id="date" />
+    <select id="store" onchange="updateCategoryButtons()">
+      <option value="バックスバー">バックスバー</option>
+      <option value="豚汁屋">豚汁屋</option>
+    </select>
+    <select id="staff">
+      <option value="原口">原口</option>
+      <option value="大久保">大久保</option>
+      <option value="細江">細江</option>
+      <option value="その他">その他</option>
+    </select><br/>
+    <input type="text" id="amount" placeholder="金額"/>
+    <input type="text" id="memo" placeholder="メモ（任意）"/><br/>
+    <div class="category-buttons" id="categoryButtons"></div>
+  </div>
+  <div class="log" id="logDisplay"></div>
+  <div class="admin-display">
+    <input type="password" id="adminPass" placeholder="管理者パスワード" />
+    <button onclick="checkAdmin()">管理者ログイン</button>
+    <div id="adminView" class="hidden">
+      <h2>💼 管理者モード</h2>
+      <p>🗕️ 日別集計：<input type="date" id="summaryDate"/><button onclick="showDailySummary()">表示</button></p>
+      <p>🗖️ 月別集計：<input type="month" id="summaryMonth"/><button onclick="showMonthlySummary()">表示</button></p>
+      <p>💰 現金残高：¥<span id="balance">0</span></p>
+      <div class="summary" id="summaryArea"></div>
+    </div>
+  </div>
   <script src="script.js"></script>
 </body>
 </html>
