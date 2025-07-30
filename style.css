@@ -4,6 +4,7 @@ body {
   font-family: 'Segoe UI', sans-serif;
   padding: 20px;
 }
+
 input, select, button {
   padding: 10px;
   margin: 6px 0;
@@ -11,11 +12,13 @@ input, select, button {
   border-radius: 8px;
   border: none;
 }
+
 input, select {
   background-color: #111;
   color: #d4af37;
   border: 1px solid #555;
 }
+
 button {
   background: linear-gradient(145deg, #2e2e2e, #1c1c1c);
   color: #d4af37;
@@ -23,9 +26,11 @@ button {
   box-shadow: 2px 2px 4px #000;
   cursor: pointer;
 }
+
 button:hover {
   background: linear-gradient(145deg, #3c3c3c, #2a2a2a);
 }
+
 .category-buttons button {
   margin: 6px;
   background: linear-gradient(145deg, #2a2a2a, #1b1b1b);
@@ -33,6 +38,7 @@ button:hover {
   border: 1px solid #555;
   font-weight: bold;
 }
+
 .log, .admin-display {
   margin-top: 20px;
   background-color: #111;
@@ -40,12 +46,14 @@ button:hover {
   border-radius: 8px;
   padding: 12px;
 }
+
 .entry {
   padding: 6px 0;
   border-bottom: 1px solid #333;
   display: flex;
   justify-content: space-between;
 }
+
 .summary {
   white-space: pre-wrap;
   background-color: #1a1a1a;
@@ -54,23 +62,7 @@ button:hover {
   margin-top: 10px;
   border-radius: 8px;
 }
+
 .hidden {
   display: none;
-}
-
-/* スマホ対応：縦並び */
-@media (max-width: 600px) {
-  input, select, button {
-    width: 100%;
-    box-sizing: border-box;
-  }
-  .category-buttons {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 5px;
-  }
-  .entry {
-    flex-direction: column;
-    align-items: flex-start;
-  }
 }
