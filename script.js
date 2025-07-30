@@ -5,6 +5,8 @@ const summaryArea = document.getElementById("summaryArea");
 let currentBalance = 0;
 let records = JSON.parse(localStorage.getItem("records") || "[]");
 
+const GAS_URL = "https://script.google.com/macros/s/AKfycbw1VCo15tfwtVYPNowUE04QuN11IzJflXnPflxP2o1OyZhBFkFHMP6nUM2HF0mcwJ8V6g/exec";
+
 const categoryData = {
   "バックスバー": [["🪙", "チケット売上"], ["🥃", "ボトル売上"], ["🍶", "酒仕入れ"], ["🥬", "食材仕入れ"],
                     ["🧻", "消耗品"], ["🍱", "ランチ食材仕入れ"], ["🧼", "ランチ消耗品"], ["📦", "その他支払い"]],
@@ -41,9 +43,10 @@ function addEntry(category, icon) {
   else currentBalance -= amount;
   balanceDisplay.textContent = currentBalance;
 
-  const record = { date, store, staff, amount, memo, category, icon, type };
+  const record = { date, store, staff, category, amount, memo, icon, type };
   records.push(record);
   saveToLocal();
+  sendToGAS(record);
 
   const div = document.createElement("div");
   div.className = "entry";
@@ -53,6 +56,15 @@ function addEntry(category, icon) {
 
   document.getElementById("amount").value = "";
   document.getElementById("memo").value = "";
+}
+
+function sendToGAS(record) {
+  fetch(GAS_URL, {
+    method: "POST",
+    mode: "no-cors",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(record)
+  });
 }
 
 function deleteEntry(index) {
