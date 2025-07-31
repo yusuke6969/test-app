@@ -27,6 +27,35 @@
     .hidden {
       display: none;
     }
+    .entry {
+      border: 1px solid gold;
+      padding: 10px;
+      margin: 10px 0;
+    }
+    .entry button {
+      width: auto;
+      margin-top: 5px;
+    }
+    #resultPopup {
+      background-color: #222;
+      border: 1px solid gold;
+      padding: 20px;
+      position: fixed;
+      top: 10%;
+      left: 10%;
+      width: 80%;
+      max-height: 80%;
+      overflow-y: auto;
+      z-index: 1000;
+    }
+    #closePopup {
+      float: right;
+      background: none;
+      border: none;
+      color: gold;
+      font-size: 1.2em;
+      cursor: pointer;
+    }
   </style>
 </head>
 <body>
@@ -46,15 +75,23 @@
       <option value="その他">その他</option>
     </select>
   </label>
-  <label>カテゴリ：
-    <select id="category"></select>
-  </label>
+  <label>カテゴリ：<select id="category"></select></label>
   <label>金額：<input type="number" id="amount" /></label>
   <label>メモ：<textarea id="memo"></textarea></label>
   <label>管理者パスワード：<input type="password" id="adminPass" /></label>
   <button id="submit">送信</button>
+  <button id="showToday">本日の集計を見る</button>
+  <button id="showMonthly" class="hidden">月別集計を見る（管理者）</button>
+
+  <div id="resultPopup" class="hidden">
+    <button id="closePopup">✕ 閉じる</button>
+    <div id="popupContent"></div>
+  </div>
+
+  <div id="entryList"></div>
+
   <script>
-    const GAS_URL = "https://script.google.com/macros/s/AKfycby_NaACwtp3NdTniYKtb_f5RYO5GVBveM4J7XLsqrssa1Koo49vegzwrCBIx0worsJaAw/exec";
+    const GAS_URL = "https://script.google.com/macros/s/AKfycbwegigk81XYTCzU4PmMlhBzW2UDeRdXt0To8Q7JIVrO9isqe8_DdzVRZUQ5WSHVEHjwMg/exec";
 
     const categoryData = {
       "バックスバー": [
@@ -69,16 +106,23 @@
 
     const dateInput = document.getElementById("date");
     const shopInput = document.getElementById("shop");
-    const categoryInput = document.getElementById("category");
     const staffInput = document.getElementById("staff");
+    const categoryInput = document.getElementById("category");
     const amountInput = document.getElementById("amount");
     const memoInput = document.getElementById("memo");
     const adminPassInput = document.getElementById("adminPass");
     const submitBtn = document.getElementById("submit");
+    const showTodayBtn = document.getElementById("showToday");
+    const showMonthlyBtn = document.getElementById("showMonthly");
+    const resultPopup = document.getElementById("resultPopup");
+    const popupContent = document.getElementById("popupContent");
+    const closePopupBtn = document.getElementById("closePopup");
+    const entryList = document.getElementById("entryList");
 
     document.addEventListener("DOMContentLoaded", () => {
       dateInput.valueAsDate = new Date();
       updateCategories();
+      renderSavedEntries();
     });
 
     shopInput.addEventListener("change", updateCategories);
@@ -94,16 +138,52 @@
       });
     }
 
+    function generateId() {
+      return "id-" + Date.now();
+    }
+
+    function renderSavedEntries() {
+      entryList.innerHTML = "";
+      const records = JSON.parse(localStorage.getItem("records") || "[]");
+      records.forEach((entry, index) => {
+        const div = document.createElement("div");
+        div.className = "entry";
+        div.innerHTML = `
+          <strong>${entry.date}</strong> | ${entry.shop} | ${entry.staff}<br />
+          ${entry.category}：${entry.amount}円<br />
+          メモ：${entry.memo}<br />
+        `;
+        const btn = document.createElement("button");
+        btn.textContent = "削除";
+        btn.onclick = async () => {
+          const res = await fetch(GAS_URL + `?id=${entry.id}`, { method: "DELETE" });
+          if (res.ok) {
+            const updated = records.filter((_, i) => i !== index);
+            localStorage.setItem("records", JSON.stringify(updated));
+            renderSavedEntries();
+          } else {
+            alert("削除失敗");
+          }
+        };
+        div.appendChild(btn);
+        entryList.appendChild(div);
+      });
+    }
+
     submitBtn.addEventListener("click", async () => {
       const data = {
+        id: generateId(),
         date: dateInput.value,
         shop: shopInput.value,
         staff: staffInput.value,
         category: categoryInput.value,
         amount: amountInput.value,
-        memo: memoInput.value,
-        pass: adminPassInput.value
+        memo: memoInput.value
       };
+
+      if (adminPassInput.value === "6969") {
+        showMonthlyBtn.classList.remove("hidden");
+      }
 
       try {
         const res = await fetch(GAS_URL, {
@@ -113,12 +193,56 @@
         });
         const text = await res.text();
         alert("送信完了: " + text);
-        amountInput.value = "";
-        memoInput.value = "";
+        const records = JSON.parse(localStorage.getItem("records") || "[]");
+        records.push(data);
+        localStorage.setItem("records", JSON.stringify(records));
+        renderSavedEntries();
       } catch (e) {
         alert("送信エラー: " + e);
       }
     });
+
+    showTodayBtn.addEventListener("click", () => {
+      const today = dateInput.value;
+      const records = JSON.parse(localStorage.getItem("records") || "[]");
+      const todayRecords = records.filter(r => r.date === today);
+      const summary = {};
+      todayRecords.forEach(r => {
+        summary[r.category] = (summary[r.category] || 0) + Number(r.amount);
+      });
+      let html = `<h3>${today} の集計</h3>`;
+      for (const [cat, amt] of Object.entries(summary)) {
+        html += `<p>${cat}：${amt.toLocaleString()} 円</p>`;
+      }
+      if (todayRecords.length === 0) html += "<p>本日の入力はまだありません。</p>";
+      popupContent.innerHTML = html;
+      resultPopup.classList.remove("hidden");
+    });
+
+    showMonthlyBtn.addEventListener("click", () => {
+      const thisMonth = dateInput.value.substring(0, 7);
+      const records = JSON.parse(localStorage.getItem("records") || "[]");
+      const monthRecords = records.filter(r => r.date.startsWith(thisMonth));
+      const summary = {};
+      monthRecords.forEach(r => {
+        if (!summary[r.category]) summary[r.category] = [];
+        summary[r.category].push(Number(r.amount));
+      });
+      let html = `<h3>${thisMonth} の月別集計</h3>`;
+      for (const [cat, list] of Object.entries(summary)) {
+        const total = list.reduce((a, b) => a + b, 0);
+        const avg = total / list.length;
+        html += `<p>${cat}：合計 ${total.toLocaleString()} 円 ／ 平均 ${avg.toFixed(1)} 円</p>`;
+      }
+      if (monthRecords.length === 0) html += "<p>今月の入力はまだありません。</p>";
+      popupContent.innerHTML = html;
+      resultPopup.classList.remove("hidden");
+    });
+
+    closePopupBtn.addEventListener("click", () => {
+      resultPopup.classList.add("hidden");
+    });
   </script>
 </body>
 </html>
+
