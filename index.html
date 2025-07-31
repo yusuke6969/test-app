@@ -148,15 +148,15 @@
       records.forEach((entry, index) => {
         const div = document.createElement("div");
         div.className = "entry";
-        div.innerHTML = `
+        div.innerHTML = 
           <strong>${entry.date}</strong> | ${entry.shop} | ${entry.staff}<br />
           ${entry.category}：${entry.amount}円<br />
           メモ：${entry.memo}<br />
-        `;
+        ;
         const btn = document.createElement("button");
         btn.textContent = "削除";
         btn.onclick = async () => {
-          const res = await fetch(GAS_URL + `?id=${entry.id}`, { method: "DELETE" });
+          const res = await fetch(GAS_URL + ?id=${entry.id}, { method: "DELETE" });
           if (res.ok) {
             const updated = records.filter((_, i) => i !== index);
             localStorage.setItem("records", JSON.stringify(updated));
@@ -210,9 +210,9 @@
       todayRecords.forEach(r => {
         summary[r.category] = (summary[r.category] || 0) + Number(r.amount);
       });
-      let html = `<h3>${today} の集計</h3>`;
+      let html = <h3>${today} の集計</h3>;
       for (const [cat, amt] of Object.entries(summary)) {
-        html += `<p>${cat}：${amt.toLocaleString()} 円</p>`;
+        html += <p>${cat}：${amt.toLocaleString()} 円</p>;
       }
       if (todayRecords.length === 0) html += "<p>本日の入力はまだありません。</p>";
       popupContent.innerHTML = html;
@@ -228,11 +228,11 @@
         if (!summary[r.category]) summary[r.category] = [];
         summary[r.category].push(Number(r.amount));
       });
-      let html = `<h3>${thisMonth} の月別集計</h3>`;
+      let html = <h3>${thisMonth} の月別集計</h3>;
       for (const [cat, list] of Object.entries(summary)) {
         const total = list.reduce((a, b) => a + b, 0);
         const avg = total / list.length;
-        html += `<p>${cat}：合計 ${total.toLocaleString()} 円 ／ 平均 ${avg.toFixed(1)} 円</p>`;
+        html += <p>${cat}：合計 ${total.toLocaleString()} 円 ／ 平均 ${avg.toFixed(1)} 円</p>;
       }
       if (monthRecords.length === 0) html += "<p>今月の入力はまだありません。</p>";
       popupContent.innerHTML = html;
@@ -244,5 +244,4 @@
     });
   </script>
 </body>
-</html>
-
+</html>　
