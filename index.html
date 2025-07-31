@@ -184,7 +184,7 @@
 
       try {
         const res = await fetch(GAS_URL, {
-          method: ""DELETE",
+          method: "POST",
         
           body: JSON.stringify(data),
           headers: { "Content-Type": "application/json" }
@@ -240,6 +240,23 @@
     closePopupBtn.addEventListener("click", () => {
       resultPopup.classList.add("hidden");
     });
+ function deleteEntry(id) {
+  fetch(`${GAS_URL}?id=${id}`, {
+    method: "DELETE"
+  })
+    .then(response => response.text())
+    .then(result => {
+      alert("削除完了：" + result);
+      // ローカルストレージから削除
+      const records = JSON.parse(localStorage.getItem("records")) || [];
+      const updatedRecords = records.filter(r => r.id !== id);
+      localStorage.setItem("records", JSON.stringify(updatedRecords));
+      renderSavedEntries(); // 表示更新
+    })
+    .catch(error => {
+      alert("削除エラー: " + error);
+    });
+}
   </script>
 </body>
 </html>
