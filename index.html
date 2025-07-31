@@ -152,15 +152,10 @@
           メモ：${entry.memo}<br />`;
         const btn = document.createElement("button");
         btn.textContent = "削除";
-        btn.onclick = async () => {
-          const res = await fetch(`${GAS_URL}?id=${entry.id}`, { method: "DELETE" });
-          if (res.ok) {
-            const updated = records.filter((_, i) => i !== index);
-            localStorage.setItem("records", JSON.stringify(updated));
-            renderSavedEntries();
-          } else {
-            alert("削除失敗");
-          }
+        btn.onclick =  () => {
+          deleteEntry(entry.id);
+          
+          
         };
         div.appendChild(btn);
         entryList.appendChild(div);
