@@ -2,40 +2,123 @@
 <html lang="ja">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>会計アプリ</title>
-  <link rel="stylesheet" href="style.css">
+  <style>
+    body {
+      background-color: #111;
+      color: gold;
+      font-family: Arial, sans-serif;
+      padding: 20px;
+    }
+    input, select, button, textarea {
+      display: block;
+      margin: 10px 0;
+      padding: 10px;
+      width: 100%;
+      font-size: 1em;
+    }
+    button {
+      background-color: #333;
+      color: gold;
+      border: 1px solid gold;
+      cursor: pointer;
+    }
+    .hidden {
+      display: none;
+    }
+  </style>
 </head>
 <body>
-  <h1>会計アプリ（GAS連携版）</h1>
-  <div>
-    <input type="date" id="date" />
-    <select id="store" onchange="updateCategoryButtons()">
+  <h1>会計アプリ</h1>
+  <label>日付：<input type="date" id="date" /></label>
+  <label>店舗名：
+    <select id="shop">
       <option value="バックスバー">バックスバー</option>
       <option value="豚汁屋">豚汁屋</option>
     </select>
+  </label>
+  <label>担当者：
     <select id="staff">
       <option value="原口">原口</option>
-      <option value="大久保">大久保</option>
       <option value="細江">細江</option>
+      <option value="大久保">大久保</option>
       <option value="その他">その他</option>
-    </select><br/>
-    <input type="text" id="amount" placeholder="金額"/>
-    <input type="text" id="memo" placeholder="メモ（任意）"/><br/>
-    <div class="category-buttons" id="categoryButtons"></div>
-  </div>
-  <div class="log" id="logDisplay"></div>
-  <div class="admin-display">
-    <input type="password" id="adminPass" placeholder="管理者パスワード" />
-    <button onclick="checkAdmin()">管理者ログイン</button>
-    <div id="adminView" class="hidden">
-      <h2>💼 管理者モード</h2>
-      <p>🗕️ 日別集計：<input type="date" id="summaryDate"/><button onclick="showDailySummary()">表示</button></p>
-      <p>🗖️ 月別集計：<input type="month" id="summaryMonth"/><button onclick="showMonthlySummary()">表示</button></p>
-      <p>💰 現金残高：¥<span id="balance">0</span></p>
-      <div class="summary" id="summaryArea"></div>
-    </div>
-  </div>
-  <script src="script.js"></script>
+    </select>
+  </label>
+  <label>カテゴリ：
+    <select id="category"></select>
+  </label>
+  <label>金額：<input type="number" id="amount" /></label>
+  <label>メモ：<textarea id="memo"></textarea></label>
+  <label>管理者パスワード：<input type="password" id="adminPass" /></label>
+  <button id="submit">送信</button>
+  <script>
+    const GAS_URL = "https://script.google.com/macros/s/AKfycby_NaACwtp3NdTniYKtb_f5RYO5GVBveM4J7XLsqrssa1Koo49vegzwrCBIx0worsJaAw/exec";
+
+    const categoryData = {
+      "バックスバー": [
+        "チケット売上", "ボトル売上", "酒仕入れ", "食材仕入れ",
+        "消耗品", "ランチ食材仕入れ", "ランチ消耗品", "その他支払い"
+      ],
+      "豚汁屋": [
+        "売上", "肉仕入れ", "野菜仕入れ", "米仕入れ",
+        "その他食材仕入れ", "酒類仕入れ", "消耗品", "その他支払い"
+      ]
+    };
+
+    const dateInput = document.getElementById("date");
+    const shopInput = document.getElementById("shop");
+    const categoryInput = document.getElementById("category");
+    const staffInput = document.getElementById("staff");
+    const amountInput = document.getElementById("amount");
+    const memoInput = document.getElementById("memo");
+    const adminPassInput = document.getElementById("adminPass");
+    const submitBtn = document.getElementById("submit");
+
+    document.addEventListener("DOMContentLoaded", () => {
+      dateInput.valueAsDate = new Date();
+      updateCategories();
+    });
+
+    shopInput.addEventListener("change", updateCategories);
+
+    function updateCategories() {
+      const shop = shopInput.value;
+      categoryInput.innerHTML = "";
+      categoryData[shop].forEach(cat => {
+        const option = document.createElement("option");
+        option.value = cat;
+        option.textContent = cat;
+        categoryInput.appendChild(option);
+      });
+    }
+
+    submitBtn.addEventListener("click", async () => {
+      const data = {
+        date: dateInput.value,
+        shop: shopInput.value,
+        staff: staffInput.value,
+        category: categoryInput.value,
+        amount: amountInput.value,
+        memo: memoInput.value,
+        pass: adminPassInput.value
+      };
+
+      try {
+        const res = await fetch(GAS_URL, {
+          method: "POST",
+          body: JSON.stringify(data),
+          headers: { "Content-Type": "application/json" }
+        });
+        const text = await res.text();
+        alert("送信完了: " + text);
+        amountInput.value = "";
+        memoInput.value = "";
+      } catch (e) {
+        alert("送信エラー: " + e);
+      }
+    });
+  </script>
 </body>
 </html>
