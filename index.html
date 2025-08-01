@@ -1,14 +1,12 @@
 <!DOCTYPE html>
 <html lang="ja">
-<head>
-  <meta charset="UTF-8">
-  <title>GAS送信テスト</title>
-</head>
+<head><meta charset="UTF-8"><title>GAS送信テスト</title></head>
 <body>
   <h1>GASへ送信テスト</h1>
   <button id="send">送信</button>
+  <div id="result"></div>
   <script>
-    const GAS_URL = "https://script.google.com/macros/s/AKfycbxk1eay-cYFgoKKVw_zyNDCPqjilSzx8vVkb3WOA220H5IrhM4Q8dUnbd5OpE-x44nbOw/exec";
+    const GAS_URL = "https://script.google.com/macros/s/AKfycbzEDFbhLf9UK_Fhu_kieMGIXr_Pty1GLSYUjPX7DlNcGCl9G8nP18ZSJ12VBd4_dD7d/exec";
 
     document.getElementById("send").addEventListener("click", async () => {
       try {
@@ -22,9 +20,9 @@
         });
 
         const result = await res.text();
-        alert("成功: " + result);
+        document.getElementById("result").textContent = "成功: " + result;
       } catch (e) {
-        alert("エラー: " + e.message);
+        document.getElementById("result").textContent = "エラー: " + e.message;
       }
     });
   </script>
