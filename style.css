@@ -1,1 +1,38 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>会計アプリ</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <h1>会計アプリ</h1>
+  <div class="form-group">
+    <input type="date" id="date">
+    <select id="shop">
+      <option value="バックスバー">バックスバー</option>
+      <option value="豚汁屋">豚汁屋</option>
+    </select>
+    <select id="staff">
+      <option value="原口">原口</option>
+      <option value="大久保">大久保</option>
+      <option value="細江">細江</option>
+    </select>
+    <input type="number" id="amount" placeholder="金額">
+    <input type="text" id="memo" placeholder="メモ（任意）">
+    <input type="password" id="adminPass" placeholder="管理者パスワード">
+    <div id="categoryButtons"></div>
+    <button id="showToday">本日の集計</button>
+    <button id="showMonthly" class="hidden">月別集計</button>
+    <div id="resultPopup" class="hidden">
+      <button id="closePopup">✕ 閉じる</button>
+      <div id="popupContent"></div>
+    </div>
+  </div>
+  <div id="entryList"></div>
+
+  <script src="script.js"></script>
+</body>
+</html>
 
