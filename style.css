@@ -1,38 +1,109 @@
-<!DOCTYPE html>
-<html lang="ja">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>会計アプリ</title>
-  <link rel="stylesheet" href="style.css">
-</head>
-<body>
-  <h1>会計アプリ</h1>
-  <div class="form-group">
-    <input type="date" id="date">
-    <select id="shop">
-      <option value="バックスバー">バックスバー</option>
-      <option value="豚汁屋">豚汁屋</option>
-    </select>
-    <select id="staff">
-      <option value="原口">原口</option>
-      <option value="大久保">大久保</option>
-      <option value="細江">細江</option>
-    </select>
-    <input type="number" id="amount" placeholder="金額">
-    <input type="text" id="memo" placeholder="メモ（任意）">
-    <input type="password" id="adminPass" placeholder="管理者パスワード">
-    <div id="categoryButtons"></div>
-    <button id="showToday">本日の集計</button>
-    <button id="showMonthly" class="hidden">月別集計</button>
-    <div id="resultPopup" class="hidden">
-      <button id="closePopup">✕ 閉じる</button>
-      <div id="popupContent"></div>
-    </div>
-  </div>
-  <div id="entryList"></div>
+body {
+  background-color: #fdfdfd;
+  color: #333;
+  font-family: 'Segoe UI', sans-serif;
+  padding: 20px;
+  max-width: 600px;
+  margin: auto;
+}
 
-  <script src="script.js"></script>
-</body>
-</html>
+h1 {
+  text-align: center;
+  margin-bottom: 20px;
+}
 
+label, input, select, textarea {
+  display: block;
+  width: 100%;
+  margin: 10px 0;
+  font-size: 1em;
+}
+
+input, select, textarea {
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+}
+
+button {
+  padding: 10px;
+  margin: 5px 5px 10px 0;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  font-size: 1em;
+  color: white;
+  background: #4a90e2;
+}
+
+button:hover {
+  background: #357ABD;
+}
+
+/* 金属調カテゴリボタン */
+.category-button {
+  background: linear-gradient(145deg, #d1d1d1, #f5f5f5);
+  border: 1px solid #999;
+  border-radius: 10px;
+  box-shadow: 1px 1px 3px #aaa;
+  color: #333;
+  padding: 12px;
+  margin: 5px 5px 10px 0;
+  font-weight: bold;
+}
+
+.category-button:hover {
+  background: linear-gradient(145deg, #e2e2e2, #ffffff);
+  box-shadow: 2px 2px 5px #999;
+}
+
+/* 入力ログカード */
+.entry {
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  padding: 10px;
+  margin-top: 10px;
+  background-color: #fafafa;
+  position: relative;
+}
+
+/* 削除ボタン */
+.entry button {
+  background: crimson;
+  color: white;
+  font-size: 0.9em;
+  padding: 6px 12px;
+  border-radius: 6px;
+  border: none;
+  cursor: pointer;
+  position: absolute;
+  top: 10px;
+  right: 10px;
+}
+
+.hidden {
+  display: none;
+}
+
+#resultPopup {
+  background-color: white;
+  border: 1px solid #999;
+  padding: 20px;
+  position: fixed;
+  top: 10%;
+  left: 10%;
+  width: 80%;
+  max-height: 80%;
+  overflow-y: auto;
+  z-index: 1000;
+  box-shadow: 0px 0px 10px rgba(0,0,0,0.3);
+}
+
+#closePopup {
+  float: right;
+  background: none;
+  border: none;
+  color: #444;
+  font-size: 1.2em;
+  cursor: pointer;
+}
