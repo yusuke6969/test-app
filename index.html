@@ -236,7 +236,9 @@
     function deleteEntry(id) {
       fetch(GAS_URL, {
         method: "POST",
+        mode: "no-cors", //
         headers: { "Content-Type": "application/json" },
+        alert("送信完了"); //
         body: JSON.stringify({
           mode: "delete",
           id: id
