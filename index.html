@@ -1,259 +1,32 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>会計アプリ</title>
-  <style>
-    body {
-      background-color: #111;
-      color: gold;
-      font-family: Arial, sans-serif;
-      padding: 20px;
-    }
-    input, select, button, textarea {
-      display: block;
-      margin: 10px 0;
-      padding: 10px;
-      width: 100%;
-      font-size: 1em;
-    }
-    button {
-      background-color: #333;
-      color: gold;
-      border: 1px solid gold;
-      cursor: pointer;
-    }
-    .hidden {
-      display: none;
-    }
-    .entry {
-      border: 1px solid gold;
-      padding: 10px;
-      margin: 10px 0;
-    }
-    .entry button {
-      width: auto;
-      margin-top: 5px;
-    }
-    #resultPopup {
-      background-color: #222;
-      border: 1px solid gold;
-      padding: 20px;
-      position: fixed;
-      top: 10%;
-      left: 10%;
-      width: 80%;
-      max-height: 80%;
-      overflow-y: auto;
-      z-index: 1000;
-    }
-    #closePopup {
-      float: right;
-      background: none;
-      border: none;
-      color: gold;
-      font-size: 1.2em;
-      cursor: pointer;
-    }
-  </style>
+  <meta charset="UTF-8">
+  <title>GAS送信テスト</title>
 </head>
 <body>
-  <h1>会計アプリ</h1>
-  <label>日付：<input type="date" id="date" /></label>
-  <label>店舗名：
-    <select id="shop">
-      <option value="バックスバー">バックスバー</option>
-      <option value="豚汁屋">豚汁屋</option>
-    </select>
-  </label>
-  <label>担当者：
-    <select id="staff">
-      <option value="原口">原口</option>
-      <option value="細江">細江</option>
-      <option value="大久保">大久保</option>
-      <option value="その他">その他</option>
-    </select>
-  </label>
-  <label>カテゴリ：<select id="category"></select></label>
-  <label>金額：<input type="number" id="amount" /></label>
-  <label>メモ：<textarea id="memo"></textarea></label>
-  <label>管理者パスワード：<input type="password" id="adminPass" /></label>
-  <button id="submit">送信</button>
-  <button id="showToday">本日の集計を見る</button>
-  <button id="showMonthly" class="hidden">月別集計を見る（管理者）</button>
-
-  <div id="resultPopup" class="hidden">
-    <button id="closePopup">✕ 閉じる</button>
-    <div id="popupContent"></div>
-  </div>
-
-  <div id="entryList"></div>
-
+  <h1>GASへ送信テスト</h1>
+  <button id="send">送信</button>
   <script>
-    const GAS_URL = "https://script.google.com/macros/s/AKfycbzdJ5lriT853p8G4h2adc492nvY3zFRsJ4_uhAd4IYu8MbUsdNwqhDXm9ofkGBovlWR5w/exec";
-    const categoryData = {
-      "バックスバー": [
-        "チケット売上", "ボトル売上", "酒仕入れ", "食材仕入れ",
-        "消耗品", "ランチ食材仕入れ", "ランチ消耗品", "その他支払い"
-      ],
-      "豚汁屋": [
-        "売上", "肉仕入れ", "野菜仕入れ", "米仕入れ",
-        "その他食材仕入れ", "酒類仕入れ", "消耗品", "その他支払い"
-      ]
-    };
+    const GAS_URL = "https://script.google.com/macros/s/AKfycbzrpTORJmFd5INaQ9rHOaLUP1wcP0MXlUNzUMGOgqvf6KCZqoXZ6ANYb3Lqyh6Q00qYeQ/exec";
 
-    const dateInput = document.getElementById("date");
-    const shopInput = document.getElementById("shop");
-    const staffInput = document.getElementById("staff");
-    const categoryInput = document.getElementById("category");
-    const amountInput = document.getElementById("amount");
-    const memoInput = document.getElementById("memo");
-    const adminPassInput = document.getElementById("adminPass");
-    const submitBtn = document.getElementById("submit");
-    const showTodayBtn = document.getElementById("showToday");
-    const showMonthlyBtn = document.getElementById("showMonthly");
-    const resultPopup = document.getElementById("resultPopup");
-    const popupContent = document.getElementById("popupContent");
-    const closePopupBtn = document.getElementById("closePopup");
-    const entryList = document.getElementById("entryList");
-
-    document.addEventListener("DOMContentLoaded", () => {
-      dateInput.valueAsDate = new Date();
-      updateCategories();
-      renderSavedEntries();
-    });
-
-    shopInput.addEventListener("change", updateCategories);
-
-    function updateCategories() {
-      const shop = shopInput.value;
-      categoryInput.innerHTML = "";
-      categoryData[shop].forEach(cat => {
-        const option = document.createElement("option");
-        option.value = cat;
-        option.textContent = cat;
-        categoryInput.appendChild(option);
-      });
-    }
-
-    function generateId() {
-      return "id-" + Date.now();
-    }
-
-    function renderSavedEntries() {
-      entryList.innerHTML = "";
-      const records = JSON.parse(localStorage.getItem("records") || "[]");
-      records.forEach(entry => {
-        const div = document.createElement("div");
-        div.className = "entry";
-        div.innerHTML = `<strong>${entry.date}</strong> | ${entry.shop || "undefined"} | ${entry.staff}<br />
-          ${entry.category}：${entry.amount}円<br />
-          メモ：${entry.memo}<br />`;
-        const btn = document.createElement("button");
-        btn.textContent = "削除";
-        btn.onclick = () => deleteEntry(entry.id);
-        div.appendChild(btn);
-        entryList.appendChild(div);
-      });
-    }
-
-    submitBtn.addEventListener("click", async () => {
-      const data = {
-        id: generateId(),
-        date: dateInput.value,
-        shop: shopInput.value,
-        staff: staffInput.value,
-        category: categoryInput.value,
-        amount: amountInput.value,
-        memo: memoInput.value
-      };
-
-      if (adminPassInput.value === "6969") {
-        showMonthlyBtn.classList.remove("hidden");
-      }
-
+    document.getElementById("send").addEventListener("click", async () => {
       try {
         const res = await fetch(GAS_URL, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(data)
+          body: JSON.stringify({
+            test: "こんにちは",
+            time: new Date().toISOString()
+          })
         });
 
-        if (!res.ok) throw new Error("送信失敗");
-
-        alert("送信完了");
-        const records = JSON.parse(localStorage.getItem("records") || "[]");
-        records.push(data);
-        localStorage.setItem("records", JSON.stringify(records));
-        renderSavedEntries();
+        const result = await res.text();
+        alert("成功: " + result);
       } catch (e) {
-        alert("送信エラー: " + e.message);
+        alert("エラー: " + e.message);
       }
     });
-
-    showTodayBtn.addEventListener("click", () => {
-      const today = dateInput.value;
-      const records = JSON.parse(localStorage.getItem("records") || "[]");
-      const todayRecords = records.filter(r => r.date === today);
-      const summary = {};
-      todayRecords.forEach(r => {
-        summary[r.category] = (summary[r.category] || 0) + Number(r.amount);
-      });
-      let html = `<h3>${today} の集計</h3>`;
-      for (const [cat, amt] of Object.entries(summary)) {
-        html += `<p>${cat}：${amt.toLocaleString()} 円</p>`;
-      }
-      if (todayRecords.length === 0) html += "<p>本日の入力はまだありません。</p>";
-      popupContent.innerHTML = html;
-      resultPopup.classList.remove("hidden");
-    });
-
-    showMonthlyBtn.addEventListener("click", () => {
-      const thisMonth = dateInput.value.substring(0, 7);
-      const records = JSON.parse(localStorage.getItem("records") || "[]");
-      const monthRecords = records.filter(r => r.date.startsWith(thisMonth));
-      const summary = {};
-      monthRecords.forEach(r => {
-        if (!summary[r.category]) summary[r.category] = [];
-        summary[r.category].push(Number(r.amount));
-      });
-      let html = `<h3>${thisMonth} の月別集計</h3>`;
-      for (const [cat, list] of Object.entries(summary)) {
-        const total = list.reduce((a, b) => a + b, 0);
-        const avg = total / list.length;
-        html += `<p>${cat}：合計 ${total.toLocaleString()} 円 ／ 平均 ${avg.toFixed(1)} 円</p>`;
-      }
-      if (monthRecords.length === 0) html += "<p>今月の入力はまだありません。</p>";
-      popupContent.innerHTML = html;
-      resultPopup.classList.remove("hidden");
-    });
-
-    closePopupBtn.addEventListener("click", () => {
-      resultPopup.classList.add("hidden");
-    });
-
-    function deleteEntry(id) {
-      fetch(GAS_URL, {
-        method: "POST",
-        mode: "no-cors", //
-        headers: { "Content-Type": "application/json" },
-        alert("送信完了"); //
-        body: JSON.stringify({
-          mode: "delete",
-          id: id
-        })
-      })
-        .then(res => res.text())
-        .then(result => {
-          alert("削除完了：" + result);
-          const records = JSON.parse(localStorage.getItem("records") || "[]");
-          const updatedRecords = records.filter(r => r.id !== id);
-          localStorage.setItem("records", JSON.stringify(updatedRecords));
-          renderSavedEntries();
-        })
-        .catch(error => alert("削除エラー: " + error.message));
-    }
   </script>
 </body>
 </html>
