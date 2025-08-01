@@ -2,40 +2,37 @@
 <html lang="ja">
 <head>
   <meta charset="UTF-8" />
-  <title>送信テスト</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>会計アプリ</title>
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  <h1>GAS送信テスト</h1>
-  <button onclick="sendData()">データ送信</button>
+  <h1>会計入力</h1>
+  <form id="entry-form">
+    <label>日付: <input type="date" id="date" required></label>
+    <label>店舗:
+      <select id="shop">
+        <option value="バックスバー">バックスバー</option>
+        <option value="豚汁屋">豚汁屋</option>
+      </select>
+    </label>
+    <label>担当者:
+      <select id="staff">
+        <option value="原口">原口</option>
+        <option value="大久保">大久保</option>
+        <option value="細江">細江</option>
+      </select>
+    </label>
+    <label>金額: <input type="number" id="amount" required></label>
+    <label>メモ: <input type="text" id="memo"></label>
+    <div id="category-buttons">
+      <!-- ボタンはJSで生成 -->
+    </div>
+  </form>
 
-  <script>
-    function sendData() {
-      const data = {
-        date: "2025-08-01",
-        shop: "豚汁屋",
-        staff: "細江",
-        category: "野菜仕入",
-        amount: 3500,
-        memo: "キャベツなど"
-      };
+  <h2>入力ログ</h2>
+  <div id="log"></div>
 
-      fetch("https://script.google.com/macros/s/AKfycbxHoFVpE3pS3ah3Wa9jHGHPA0B2zXcKMGvo5synEPtd_Hsgeu93Yi_14aIbn1x8WDIfJQ/exec", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify(data)
-      })
-      .then(response => response.json())
-      .then(result => {
-        console.log("送信成功:", result);
-        alert("送信完了: " + JSON.stringify(result));
-      })
-      .catch(error => {
-        console.error("送信失敗:", error);
-        alert("送信エラー: " + error);
-      });
-    }
-  </script>
+  <script src="script.js"></script>
 </body>
 </html>
