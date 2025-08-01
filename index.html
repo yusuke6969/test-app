@@ -91,7 +91,7 @@
   <div id="entryList"></div>
 
   <script>
-    const GAS_URL = "https://script.google.com/macros/s/AKfycbyWn_IcEG-_isrE4vPX_ZIReVM1kbkDjYLKkU69F7zp4azAdRicLEIRYIL0x4CUQXo2/exec";
+    const GAS_URL = "https://script.google.com/macros/s/AKfycbzJfvfvJ7R5alaJGzzkHo-HrKOSDC3HICV7Jnrvmc4qCItrF4-PT0PCsbuGzj_1Cd9GfA/exec";
     const categoryData = {
       "バックスバー": [
         "チケット売上", "ボトル売上", "酒仕入れ", "食材仕入れ",
@@ -144,19 +144,15 @@
     function renderSavedEntries() {
       entryList.innerHTML = "";
       const records = JSON.parse(localStorage.getItem("records") || "[]");
-      records.forEach((entry, index) => {
+      records.forEach(entry => {
         const div = document.createElement("div");
         div.className = "entry";
-        div.innerHTML = `<strong>${entry.date}</strong> | ${entry.shop} | ${entry.staff}<br />
+        div.innerHTML = `<strong>${entry.date}</strong> | ${entry.shop || "undefined"} | ${entry.staff}<br />
           ${entry.category}：${entry.amount}円<br />
           メモ：${entry.memo}<br />`;
         const btn = document.createElement("button");
         btn.textContent = "削除";
-        btn.onclick =  () => {
-          deleteEntry(entry.id);
-          
-          
-        };
+        btn.onclick = () => deleteEntry(entry.id);
         div.appendChild(btn);
         entryList.appendChild(div);
       });
@@ -180,18 +176,19 @@
       try {
         const res = await fetch(GAS_URL, {
           method: "POST",
-          mode: "cors",  //
-          body: JSON.stringify(data),
-          headers: { "Content-Type": "application/json" }
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(data)
         });
-        
+
+        if (!res.ok) throw new Error("送信失敗");
+
         alert("送信完了");
         const records = JSON.parse(localStorage.getItem("records") || "[]");
         records.push(data);
         localStorage.setItem("records", JSON.stringify(records));
         renderSavedEntries();
       } catch (e) {
-        alert("送信エラー: " + e);
+        alert("送信エラー: " + e.message);
       }
     });
 
@@ -235,23 +232,26 @@
     closePopupBtn.addEventListener("click", () => {
       resultPopup.classList.add("hidden");
     });
- function deleteEntry(id) {
-  fetch(`${GAS_URL}?id=${id}`, {
-    method: "DELETE"
-  })
-    .then(response => response.text())
-    .then(result => {
-      alert("削除完了：" + result);
-      // ローカルストレージから削除
-      const records = JSON.parse(localStorage.getItem("records")) || [];
-      const updatedRecords = records.filter(r => r.id !== id);
-      localStorage.setItem("records", JSON.stringify(updatedRecords));
-      renderSavedEntries(); // 表示更新
-    })
-    .catch(error => {
-      alert("削除エラー: " + error);
-    });
-}
+
+    function deleteEntry(id) {
+      fetch(GAS_URL, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          mode: "delete",
+          id: id
+        })
+      })
+        .then(res => res.text())
+        .then(result => {
+          alert("削除完了：" + result);
+          const records = JSON.parse(localStorage.getItem("records") || "[]");
+          const updatedRecords = records.filter(r => r.id !== id);
+          localStorage.setItem("records", JSON.stringify(updatedRecords));
+          renderSavedEntries();
+        })
+        .catch(error => alert("削除エラー: " + error.message));
+    }
   </script>
 </body>
 </html>
