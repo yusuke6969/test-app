@@ -8,25 +8,38 @@
 </head>
 <body>
   <h1>会計入力</h1>
-  <form id="entry-form">
-    <label>日付: <input type="date" id="date" required></label>
-    <label>店舗:
-      <select id="shop">
-        <option value="バックスバー">バックスバー</option>
-        <option value="豚汁屋">豚汁屋</option>
-      </select>
-    </label>
-    <label>担当者:
-      <select id="staff">
-        <option value="原口">原口</option>
-        <option value="大久保">大久保</option>
-        <option value="細江">細江</option>
-      </select>
-    </label>
-    <label>金額: <input type="number" id="amount" required></label>
-    <label>メモ: <input type="text" id="memo"></label>
-    <div id="category-buttons">
-      <!-- ボタンはJSで生成 -->
+  <form id="input-form">
+    <label for="date">日付:</label>
+    <input type="date" id="date" name="date" required />
+
+    <label for="shop">店舗:</label>
+    <select id="shop" name="shop" required>
+      <option value="バックスバー">バックスバー</option>
+      <option value="豚汁屋">豚汁屋</option>
+    </select>
+
+    <label for="staff">担当者:</label>
+    <select id="staff" name="staff" required>
+      <option value="原口">原口</option>
+      <option value="大久保">大久保</option>
+      <option value="細江">細江</option>
+    </select>
+
+    <label for="amount">金額:</label>
+    <input type="number" id="amount" name="amount" required />
+
+    <label for="memo">メモ:</label>
+    <input type="text" id="memo" name="memo" />
+
+    <div class="category-buttons">
+      <button type="button" class="category-button" data-category="チケット売上">🎫 チケット売上</button>
+      <button type="button" class="category-button" data-category="ボトル売上">🍾 ボトル売上</button>
+      <button type="button" class="category-button" data-category="酒仕入れ">🍶 酒仕入れ</button>
+      <button type="button" class="category-button" data-category="食材仕入れ">🥦 食材仕入れ</button>
+      <button type="button" class="category-button" data-category="消耗品">🧻 消耗品</button>
+      <button type="button" class="category-button" data-category="ランチ食材仕入れ">🍱 ランチ食材仕入れ</button>
+      <button type="button" class="category-button" data-category="ランチ消耗品">🥢 ランチ消耗品</button>
+      <button type="button" class="category-button" data-category="その他支払い">💸 その他支払い</button>
     </div>
   </form>
 
@@ -36,3 +49,5 @@
   <script src="script.js"></script>
 </body>
 </html>
+
+
