@@ -1,4 +1,4 @@
-const scriptURL = "https://script.google.com/macros/s/AKfycbyfUfR3CAzXOVnhhOYQQZO0ijklVS-_hgjiznnFMje0AUGqun55vLfN8J6_6A9lHRXU4w/exec";
+const scriptURL = "https://script.google.com/macros/s/AKfycbwp162d5vYtZRgYVcNQ2ujrFp9k7pZAuOG_TDViPHTuBEorqJ7ViKI1YSwlqjkNcQo0cQ/exec";
 
 document.addEventListener('DOMContentLoaded', () => {
   document.querySelectorAll('.category-button').forEach(btn => {
@@ -68,6 +68,7 @@ function deleteEntry(id, button) {
     body: JSON.stringify({ mode: 'delete', id })
   });
 }
+
 
 
 
