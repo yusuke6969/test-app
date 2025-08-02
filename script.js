@@ -31,6 +31,7 @@ function handleSubmit(category) {
   // スプレッドシート送信
   fetch(scriptURL, {
     method: 'POST',
+    headers: { "Content-Type": "application/json" },
     body: JSON.stringify(data)
   });
 }
@@ -72,9 +73,11 @@ function deleteEntry(id, button) {
   // GAS削除送信
   fetch(scriptURL, {
     method: 'POST',
+    headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ mode: 'delete', id })
   });
 }
+
 
 
 
