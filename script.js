@@ -1,11 +1,11 @@
-const scriptURL = "https://script.google.com/macros/s/AKfycbyZxcpjdJ9mlz7CpsH2a8buf7tOA0xPhbWYwVFjhScZzm0lKWBlnO3R4HWSCFDIrsC4LQ/exec";
+const scriptURL = "https://script.google.com/macros/s/AKfycbyrUIX2cXV4sJPCAvn9vcodWJOci5QIi70JKl2BZ9g0J02rCOKmtRaw7GS4KBSFURJhcw/exec";
 
 document.addEventListener('DOMContentLoaded', () => {
   document.querySelectorAll('.category-button').forEach(btn => {
     btn.addEventListener('click', () => handleSubmit(btn.dataset.category));
   });
 
-  loadEntries(); // ← スプレッドシートから読み込むよう変更
+  loadEntries(); // スプレッドシートから取得
 });
 
 function handleSubmit(category) {
@@ -16,17 +16,15 @@ function handleSubmit(category) {
   const memo = document.getElementById('memo').value;
   const id = Date.now().toString();
 
-  const data = {
-    id, date, shop, staff, category, amount, memo
-  };
+  const data = { id, date, shop, staff, category, amount, memo };
 
-  renderEntry(data); // 表示だけ（ローカル保存しない）
+  renderEntry(data);
 
-  // フォームリセット
+  // 入力リセット
   document.getElementById('amount').value = '';
   document.getElementById('memo').value = '';
 
-  // スプレッドシート送信
+  // スプレッドシートに送信
   fetch(scriptURL, {
     method: 'POST',
     headers: { "Content-Type": "application/json" },
@@ -39,7 +37,7 @@ function loadEntries() {
     .then(res => res.json())
     .then(entries => {
       const log = document.getElementById('log');
-      log.innerHTML = ""; // いったんクリア
+      log.innerHTML = "";
       entries.forEach(renderEntry);
     })
     .catch(error => console.error("読み込みエラー:", error));
@@ -63,10 +61,12 @@ function deleteEntry(id, button) {
   const entryDiv = button.closest('.entry');
   if (entryDiv) entryDiv.remove();
 
-  // GAS削除送信
+  // GASに削除リクエスト
   fetch(scriptURL, {
     method: 'POST',
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ mode: 'delete', id })
   });
 }
+
+
