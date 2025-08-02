@@ -5,7 +5,7 @@ document.addEventListener('DOMContentLoaded', () => {
     btn.addEventListener('click', () => handleSubmit(btn.dataset.category));
   });
 
-  loadEntries();
+  loadEntries(); // ← スプレッドシートから読み込むよう変更
 });
 
 function handleSubmit(category) {
@@ -20,9 +20,7 @@ function handleSubmit(category) {
     id, date, shop, staff, category, amount, memo
   };
 
-  // 表示と保存
-  saveToLocal(data);
-  renderEntry(data);
+  renderEntry(data); // 表示だけ（ローカル保存しない）
 
   // フォームリセット
   document.getElementById('amount').value = '';
@@ -36,15 +34,15 @@ function handleSubmit(category) {
   });
 }
 
-function saveToLocal(entry) {
-  let entries = JSON.parse(localStorage.getItem('entries')) || [];
-  entries.push(entry);
-  localStorage.setItem('entries', JSON.stringify(entries));
-}
-
 function loadEntries() {
-  const entries = JSON.parse(localStorage.getItem('entries')) || [];
-  entries.forEach(renderEntry);
+  fetch(scriptURL)
+    .then(res => res.json())
+    .then(entries => {
+      const log = document.getElementById('log');
+      log.innerHTML = ""; // いったんクリア
+      entries.forEach(renderEntry);
+    })
+    .catch(error => console.error("読み込みエラー:", error));
 }
 
 function renderEntry(entry) {
@@ -61,11 +59,6 @@ function renderEntry(entry) {
 }
 
 function deleteEntry(id, button) {
-  // ローカル削除
-  let entries = JSON.parse(localStorage.getItem('entries')) || [];
-  entries = entries.filter(e => e.id !== id);
-  localStorage.setItem('entries', JSON.stringify(entries));
-
   // 表示削除
   const entryDiv = button.closest('.entry');
   if (entryDiv) entryDiv.remove();
@@ -77,9 +70,3 @@ function deleteEntry(id, button) {
     body: JSON.stringify({ mode: 'delete', id })
   });
 }
-
-
-
-
-
-
